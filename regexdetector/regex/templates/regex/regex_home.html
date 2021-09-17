@@ -1,0 +1,71 @@
+{% load crispy_forms_tags %}
+
+<!DOCTYPE html>
+<head>
+    
+    <title>Regex Homepage</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+</head>
+
+<html>
+<body>
+
+    <div class="container">
+        <h2 class="mt-5">Regex Evaluator</h2>
+        <div class="mt-4">
+            <form method="POST">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <button class="btn btn-info" type="submit">Test</button>
+            </form>
+        </div>
+        
+        <section class="result_box" hidden>
+            <h2 class='mt-3'>Regex Matched Result:</h2>
+            <p class="alert result_content"></p>
+        </section>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script>        
+        $("#id_user_regex").change(function(){
+            var user_re = $(this).val();
+            var test_txt = $("#id_test_text").val();
+
+            $.ajax({
+                url: "{% url 'evaluate_regex' %}",
+                data: {
+                    "user_re": user_re,
+                    "test_txt": test_txt
+                },
+                dataType:"json",
+                success: function(data){
+                    
+                    if(data.result)
+                    {
+                        $(".result_content").removeClass("alert-danger");
+                        $(".result_content").text(data.result);
+                    }    
+                    else
+                    {
+                        $(".result_content").removeClass("alert-success");
+                        $(".result_content").text("None");
+                    }
+
+                    $(".result_content").addClass("alert-"+data.alert);
+                    $(".result_box").removeAttr("hidden");
+                        
+                }
+                
+            });
+        });
+        
+    </script>
+
+</body>
+</html>
